@@ -1,0 +1,33 @@
+CROSS_HOST="x86_64-w64-mingw32"
+GIT_URI="git://git.jdl.com/software/dtc.git"
+GIT_TAG=v${PV}
+inherit cross git
+
+NAME="mingw64-x86_64-libfdt"
+VERSION=1.4.0
+RELEASE=1
+CATEGORY="Devel"
+SUMMARY="Flattened device tree library for Win64 toolchain"
+DESCRIPTION="The Device Tree Compiler processes a textual representation of a
+device tree in the Device Tree Source (DTS) format into a binary device tree
+in the form expected by the Linux kernel."
+HOMEPAGE="http://git.jdl.com/gitweb/?p=dtc.git"
+
+src_compile() {
+	lndirs
+	cd ${B}
+	cygmake libfdt \
+		CC=${CC} AR=${AR} CFLAGS="${CFLAGS}" \
+		LIBFDT_lib="libfdt/libfdt-1.dll" \
+		LIBFDT_soname="libfdt/libfdt.dll.a" \
+		SHAREDLIB_LINK_OPTIONS="-shared -Wl,--out-implib,"
+}
+
+src_install() {
+	cd ${B}/libfdt
+	dobin libfdt-1.dll
+	dolib libfdt.a libfdt.dll.a
+	doinclude fdt.h libfdt.h libfdt_env.h
+}
+
+DOCS="README.license Documentation/*.txt"
